@@ -13,7 +13,22 @@ params = {
 			'lang' : lang_
 		}
 res = requests.get(url, params=params)
+# res.json() produces all data like
+# {'response': 
+# 	[{'text': 'welcome', 
+# 		'items': [	
+# 					{'pos': 'adverb', 'item': 'Warmly', 'weight': 100}, 
+# 					{'pos': 'adjective', 'item': 'Hearty', 'weight': 98}, 
+# 					{'pos': 'adjective', 'item': 'Hospitable', 'weight': 94},  ... 
+# 				]
+# 		}
+# 	], 
+# 	'code': 200, 
+# 	'request': {'text': ['welcome'], 'limit': 50, 'pos': 'noun,adjective,verb,adverb', 'type': 'stimulus', 'lang': 'en', 'indent': 'yes'}, 'version': '1.0'
+# }
 
-	
+# start parsing
+
+res.json()
 
 
