@@ -1,6 +1,10 @@
 # Word Associations Network API 
 # Making XML Query
 
+import urllib.request
+from bs4 import BeautifulSoup
+from urllib import parse
+import re
 import requests
 
 apikey = "9abec642-54e8-496a-9784-c98d0a428772" #about key...
@@ -29,6 +33,36 @@ res = requests.get(url, params=params)
 
 # start parsing
 
-res.json()
+data = res.json()['response']
+
+for elem in data: # because it can response multiple keywords, 
+	keywords = elem['text']
+	items = elem['items']
+	
+# input parsing : Hangul word -> English words
+
+def word_translate(token):
+	translated_list = []
+		
+
+	return translated_list
+
+#다음 검색사전에서 크롤링
+def translate(keyword):
+  #다음 검색사전 활용 
+  request = urllib.request.Request("http://dic.daum.net/search.do?q="+parse.quote(keyword)+"&dic=eng") 
+  data = urllib.request.urlopen(request).read().decode() #UTF-8 encode
+  bs = BeautifulSoup(data,'lxml')
+  #파싱 
+  ent = bs.find_all('div',attrs={'class':'cleanword_type kuke_type'}) 
+  res = ent[0].find_all('span',attrs={'class':'txt_search'}) 
+  words = []
+  for word in res:
+    words.append(word.text)
+    print(word.text)
+  return words
+
+
+
 
 
