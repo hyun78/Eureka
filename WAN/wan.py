@@ -7,16 +7,7 @@ from urllib import parse
 import re
 import requests
 
-apikey = "9abec642-54e8-496a-9784-c98d0a428772" #about key...
-url = "https://api.wordassociations.net/associations/v1.0/json/search?"
-text_ = "welcome"
-lang_ = "en"
-params = {
-			'apikey' : apikey,
-			'text' : text_,
-			'lang' : lang_
-		}
-res = requests.get(url, params=params)
+
 # res.json() produces all data like
 # {'response': 
 # 	[{'text': 'welcome', 
@@ -33,19 +24,45 @@ res = requests.get(url, params=params)
 
 # start parsing
 
-data = res.json()['response']
 
-for elem in data: # because it can response multiple keywords, 
-	keywords = elem['text']
-	items = elem['items']
 	
-# input parsing : Hangul word -> English words
+#여러개의 키워드를 검색 
+def search_WAN(input_text):
+	apikey = "9abec642-54e8-496a-9784-c98d0a428772" #about key...
+	url = "https://api.wordassociations.net/associations/v1.0/json/search?"
+	#text_ = "welcome"
+	lang_ = "en"
+	params = {
+				'apikey' : apikey,
+				'text' : input_text,
+				'lang' : lang_
+			}
+	res = requests.get(url, params=params)
+	data = res.json()['response']
 
+	for elem in data: # because it can response multiple keywords, 
+		keywords = elem['text']
+		items = elem['items']
+	return data
+
+# input parsing : Hangul word -> English words
 def word_translate(token):
 	translated_list = []
 		
 
 	return translated_list
+
+# word list- > pronunciation list in korean
+def get_korean_pronunciation(word_list):
+	result = []
+	for word in word_list:
+		request = urllib.request.Request("http://aha-dic.com/View.asp?word="+parse.quote(word))
+		data = urllib.request.urlopen(request).read().decode() #UTF-8 encode
+		bs = BeautifulSoup(data,'lxml')
+		ent = bs.find_all('span',attrs={'class':'phoneticKor'})
+		if len(ent):
+			result.append(ent[0].text[1:-1])
+	return result
 
 #다음 검색사전에서 크롤링
 def translate(keyword):
@@ -86,6 +103,8 @@ def find_by_key_dic(key_id):
 		words.append(word.text)
 		print(word.text)
 	return words
+
+#관사 제거 , 두 단어 이상 제거	
 def stopword_removal(word_list):
   stopword = ['an','a','the']
   result = []
@@ -93,9 +112,10 @@ def stopword_removal(word_list):
     temp = item.split(' ')    
     tmp = []
     for elem in temp:
-      if elem not in ['a','an','the']:
+      if elem not in stopword:
         tmp.append(elem)
-    result.append(' '.join(tmp))
+    if len(tmp) <2:
+	    result.append(' '.join(tmp))
   return result
 
 
