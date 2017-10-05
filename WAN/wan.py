@@ -73,14 +73,15 @@ def translate(keyword):
 	#파싱 
 	ent = bs.find_all('div',attrs={'class':'search_box #box'}) 
 	if len(ent): # 동음이의어 존재 
-		ent = ent[0].find_all('div',attrs={'class':'search_type kuke_type'}) 
-		words = []
-		for elem in ent:
-			res = elem.find_all('span',attrs={'class':'txt_search'}) 
+		ent = ent[0].find_all('span',attrs={'class':'txt_search'})
 		
-			for word in res:
-				words.append(word.text)
-				print(word.text)
+		words = []
+		# for elem in ent:
+		# 	res = elem.find_all('span',attrs={'class':'txt_search'}) 
+		
+		for word in ent:
+			words.append(word.text.strip())
+			print(word.text)
 		return stopword_removal((words))
 	else: # 동음이의어 없응
 		text = bs.text
@@ -100,7 +101,7 @@ def find_by_key_dic(key_id):
 	res = bs.find_all('span',attrs={'class':'txt_mean'})
 	words = []
 	for word in res:
-		words.append(word.text)
+		words.append(word.text.strip())
 		print(word.text)
 	return words
 
