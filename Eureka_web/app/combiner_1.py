@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from urllib import parse
 import re
 import requests
+from syllabipy.sonoripy import SonoriPy
 #input : specified data structure as below
 # {
 # keyword_1 : key1
@@ -24,7 +25,7 @@ import requests
 #1 Abbreviation 
 # n = 키워드 수 
 # m = 줄일 단어의 수 ex: Federal express 의 경우 m=2
-def generate_abbreviation(associated_words_set,n,m):
+def generate_abbreviation_crawling(associated_words_set,n,m):
 	name_list = []
 	for i in range(n*m):
 		name_list.append(random_phrase_generation(associated_words_set,n,m))
@@ -38,12 +39,45 @@ def generate_abbreviation(associated_words_set,n,m):
 		ent = bs.find_all('tr')
 		m = len(ent)
 		res = []
-		a = 1
+		
 		for i in range(1,m):
 			tup = [ent[i].find_all('a')[0].text,ent[i].find_all('td')[1].text]
 			res.append(tup)
 		result[' '.join(p)] = res
 
+	return result
+
+def generate_abbreviation_handmade(associated_words_set,n,m):
+	name_list = []
+	for i in range(n*m):
+		name_list.append(random_phrase_generation(associated_words_set,n,m))
+	result = {}
+	for p in name_list:
+		res = []
+		full_word = ""
+		abb = ""
+		
+		last = len(p)-1
+		idx = 0
+		for w in p:
+			tokens = SonoriPy(w.lower())
+			temp_n= len(tokens)
+			if idx==0:
+				start = 0	
+			elif idx==last:
+				start = temp_n-1
+			else:
+				if temp_n!=1:
+					start = randint(0,temp_n-2)
+				else:
+					start = 0
+			idx +=1
+			abb += tokens[start]
+			tokens[start] = tokens[start].upper()
+			for t in tokens:
+				full_word += t
+			full_word += " "		
+		result[' '.join(p)] = abb.upper(),full_word
 	return result
 
 #2 Acronym
@@ -78,7 +112,13 @@ def get_random_associate_word_of_kth_keyword(associated_words_set,k):
 	else:
 		word = associated_words_set[k]['items'][i]['item']
 	return word
+# Helper 3
+# 단어를 모음과 자음으로 쪼갠다. 
+# ex : crunch -> cr u nch 
+# ex : king -> king 
 
+def tokenize(word):
+	return None
 # for test
 def test():
 	text_string = 'fresh water white cool'
