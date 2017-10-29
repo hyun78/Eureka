@@ -36,11 +36,11 @@ def search_WAN(input_text):
 	apikey = "9abec642-54e8-496a-9784-c98d0a428772" #about key...
 	url = "https://api.wordassociations.net/associations/v1.0/json/search?"
 	#text_ = "welcome"
-	text_ = input_text.split(" ")
+	#text_ = input_text.split(" ")
 	lang_ = "en"
 	params = {
 				'apikey' : apikey,
-				'text' : text_,
+				'text' : input_text,
 				'lang' : lang_
 			}
 	res = requests.get(url, params=params)
