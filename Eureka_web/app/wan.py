@@ -27,14 +27,20 @@ import requests
 
 	
 #여러개의 키워드를 검색 
+# input : word seperated by space
+# output : certain datastructure (tba)
+# example
+# input : 'fresh vegetable'
+# output : JSON data above
 def search_WAN(input_text):
 	apikey = "9abec642-54e8-496a-9784-c98d0a428772" #about key...
 	url = "https://api.wordassociations.net/associations/v1.0/json/search?"
 	#text_ = "welcome"
+	text_ = input_text.split(" ")
 	lang_ = "en"
 	params = {
 				'apikey' : apikey,
-				'text' : input_text,
+				'text' : text_,
 				'lang' : lang_
 			}
 	res = requests.get(url, params=params)
