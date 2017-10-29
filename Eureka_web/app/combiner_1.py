@@ -21,7 +21,7 @@ import requests
 # }
 
 
-#1 Abbreviation
+#1 Abbreviation #
 def generate_abbreviation(associated_words_set,n):
 	name_list = phrase_generation(associated_words_set,n)
 	
