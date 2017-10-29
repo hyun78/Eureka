@@ -21,7 +21,7 @@ import requests
 # }
 
 
-#1 Abbreviation #
+#1 Abbreviation # #
 def generate_abbreviation(associated_words_set,n):
 	name_list = phrase_generation(associated_words_set,n)
 	
@@ -33,6 +33,7 @@ def generate_abbreviation(associated_words_set,n):
 	ent = bs.find_all('tr')
 	m = len(ent)
 	res = []
+	a = 1
 	for i in range(1,m):
 		res.append(ent[i].find_all('a')[0].text)
 	return res
