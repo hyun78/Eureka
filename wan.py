@@ -38,7 +38,8 @@ def search_WAN(input_text):
     params = {
         'apikey': apikey,
         'text': input_text,
-        'lang': lang_
+        'lang': lang_,
+        'limit': 100
     }
     res = requests.get(url, params=params)
     data = res.json()['response']

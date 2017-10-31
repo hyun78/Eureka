@@ -18,13 +18,17 @@ def descriptive(keywords, associations):
     n = len(associations)
 
     for i in range(n):
+        associations[i].append(keywords[i])
+
+    for i in range(n):
         for j in range(n):
             if i == j:
                 continue
             for s1 in associations[i]:
                 for s2 in associations[j]:
                     if order(s1['pos'], s2['pos']):
-                        res.append((s1['item'] + s2['item']).upper())
+                        name = (s1['item'] + s2['item']).lower()
+                        res.append([name, s1['item'], s2['item']])
     return res
 
 
@@ -33,10 +37,16 @@ def morpheme(keywords, associations):
     n = len(associations)
 
     for i in range(n):
+        associations[i].append(keywords[i])
+
+    for i in range(n):
         for j in range(n):
             if i == j: continue
             for s1 in associations[i]:
+                x1 = s1['item']
                 for s2 in associations[j]:
+                    x2 = s2['item']
+                    if len(x2) > 5: continue
                     if order(s1['pos'], s2['pos']):
                         syl1 = SonoriPy(s1['item'])
                         syl2 = SonoriPy(s2['item'])
@@ -44,28 +54,68 @@ def morpheme(keywords, associations):
                         for t1 in syl1:
                             r1 += t1
                             if len(r1) > 5: break
+                            #if len(r1) < 3: continue
+                            #res.append([(r1 + x2).lower(), x1, x2])
+                            #continue
                             r2 = ""
                             for t2 in syl2:
                                 r2 += t2
                                 if len(r2) > 5: break
-                                res.append((r1 + r2).upper())
+                                x1 = s1['item'].lower()
+                                x2 = s2['item'].lower()
+                                res.append([(r1 + r2).lower(), x1, x2 ])
+    return res
+
+def prefix_suffix(keywords, associations):
+    res = []
+    n = len(associations)
+
+    for i in range(n):
+        associations[i].append(keywords[i])
+
+    for i in range(n):
+        for j in range(n):
+            #if i == j: continue
+            for s1 in associations[i]:
+                x1 = s1['item']
+                for s2 in associations[j]:
+                    x2 = s2['item']
+                    #if len(x2) > 5: break
+                    if s2['pos'] != 'noun': continue
+                    l1 = len(x1)
+                    l2 = len(x2)
+                    for common in range(2, min(l1, l2) + 1):
+                        for r1 in range(0, max(0, l1 - common)):
+                            if x1[r1] in "aeoui": continue
+                            '''max(0, min(l2 - common, 3))'''
+                            for r2 in range(0, 2):
+                                if x1[r1:r1+common] == x2[r2:r2+common]:
+                                    name = (x1[:r1] + x2[r2:]).lower()
+                                    if name == x1.lower() or name == x2.lower():
+                                        continue
+                                    res.append([name, x1, x2])
     return res
 
 def test():
-    associated_words_set = search_WAN(['fresh', 'water', 'white', 'cool'])
+    associated_words_set = search_WAN(['flower', 'tree'])
 
     keywords = []
     associations = []
     for list in associated_words_set:
-        #key = list['text']
-        #pos = get_pos(key)
-        #keywords.append({'pos' : pos, 'item' : key})
+        key = list['text']
+        pos = get_pos(key)
+        keywords.append({'pos' : pos, 'item' : key})
         associations.append(list['items'])
-    res1 = descriptive(keywords, associations)
-    print(res1)
-    res2 = morpheme(keywords, associations)
-    print(res2)
-    return
 
+
+    res1 = descriptive(keywords, associations)
+    res2 = morpheme(keywords, associations)
+    res3 = prefix_suffix(keywords, associations)
+
+    for i in range(30):#for x in res:
+        x = random.choice(res3)
+        print(x[0] + "  = " + x[1] + "  + " + x[2])
+
+    return
 
 test()
