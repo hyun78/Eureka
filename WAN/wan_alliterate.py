@@ -8,8 +8,63 @@ from urllib import parse
 import re
 import requests
 from wan import *
+from Vocabulary_104.vocabulary.vocabulary import Vocabulary as vb
+pronunciation_dict ={
+'0251' :'ɑ','0253' :'ɓ', '0254' :'ɔ',
+#'0255' :'ɕ', '0256' :'ɖ', '0257' :'ɗ',
+'0258' :'ɘ', '0259' :'ə',
+#'025A' :'ɚ',
+'025B' :'ɛ', '025C' :'ɜ',
+#'025D' :'ɝ', '025E' :'ɞ', '025F' :'ɟ', '0260' :'ɠ', '0261' :'ɡ', '0262' :'ɢ', '0263' :'ɣ', '0264' :'ɤ','0265' :'ɥ', '0266' :'ɦ', '0267' :'ɧ', '0268' :'ɨ', '0269' :'ɩ',
+#'026A' :'ɪ', '026B' :'ɫ', '026C' :'ɬ', '026D' :'ɭ', '026E' :'ɮ', '026F' :'ɯ',
+#'0270' :'ɰ', '0271' :'ɱ', '0272' :'ɲ',
+'0273' :'ɳ', #'0274' :'ɴ',
+#'0275' :'ɵ', '0276' :'ɶ', '0277' :'ɷ', '0278' :'ɸ', '0279' :'ɹ',
+#'027A' :'ɺ', '027B' :'ɻ', '027C' :'ɼ', '027D' :'ɽ', '027E' :'ɾ', '027F' :'ɿ',
+#'0280' :'ʀ', '0281' :'ʁ', '0282' :'ʂ',
+'0283' :'ʃ',
+#'0284' :'ʄ', '0285' :'ʅ', '0286' :'ʆ', '0287' :'ʇ', '0288' :'ʈ', '0289' :'ʉ', '028A' :'ʊ', '028B' :'ʋ',
+'028C' :'ʌ',
+#'028D' :'ʍ', '028E' :'ʎ', '028F' :'ʏ', '0290' :'ʐ', '0291' :'ʑ', '0292' :'ʒ', '0293' :'ʓ', '0294' :'ʔ','0295' :'ʕ', '0296' :'ʖ', '0297' :'ʗ', '0298' :'ʘ', '0299' :'ʙ',
+#'029A' :'ʚ', '029B' :'ʛ', '029C' :'ʜ', '029D' :'ʝ', '029E' :'ʞ', '029F' :'ʟ',
+#'02A0' :'ʠ', '02A1' :'ʡ', '02A2' :'ʢ',
+'02A3' :'ʣ', '02A4' :'ʤ',
+#'02A5' :'ʥ', '02A6' :'ʦ', '02A7' :'ʧ', '02A8' :'ʨ', '02A9' :'ʩ',
+#'02AA' :'ʪ', '02AB' :'ʫ', '02AC' :'ʬ', '02AD' :'ʭ', '02AE' :'ʮ', '02AF' :'ʯ',
+'00E6' : 'æ', '03B8' : 'θ'
+}
+
+def pronunciation(input_word):
+    url_test = "http://texttophonetic.appspot.com/ipa?c="
+    request = urllib.request.Request(url_test+input_word)
+    data = str(urllib.request.urlopen(request).read().decode()) #UTF-8 encode
+    data = data[0:-1] # erase last space
+    if (data[0]=='[' and data[-1]==']'):
+        data = data[1:-1]
+    data = data.replace('\'','') #erase accent 1
+    data = data.replace(',','') #erase accent 2
+    if (data.find(' ')!=-1):
+        data = data[:data.find(' ')]
+    data_len = len(data)
+    datascan = 0
+    output_pronunciation = []
+    while(datascan<data_len):
+        if data[datascan]!='\\':
+            output_pronunciation.append(data[datascan])
+            datascan = datascan+1
+        else:
+            output_pronunciation.append(pronunciation_dict[data[datascan+2:datascan+6].upper()])
+            datascan = datascan+6
+    return output_pronunciation
+
+def helper_upper(word):
+    if word in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.lower()):
+        return word.upper()
+    return word
 
 alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+pron_alpha = list(pronunciation_dict.values())
+alphabet = alphabet + pron_alpha+ [":"]
 kws = ["halal","vegetable","lunch"] #<-input 가능하게끔
 num = len(kws)
 
@@ -19,14 +74,35 @@ url = "https://api.wordassociations.net/associations/v1.0/json/search?"
 lang_ = "en"
 waset = []
 
-for i in range(num):
-    params = {
-        'apikey': apikey,
+print (search_WAN(kws))
+
+data = search_WAN(kws)
+for i in range(len(data)):
+    subdict = {'text':data[i]['text'],'noun':{}, 'adjective':{},'verb':{}, 'adverb':{}}
+    for letters in alphabet:
+        subdict['noun'][letters] = []
+        subdict['adjective'][letters] = []
+        subdict['verb'][letters] = []
+        subdict['adverb'][letters] = []
+        subdict['noun']['suf'+letters] = []
+        subdict['adjective']['suf'+letters] = []
+        subdict['verb']['suf'+letters] = []
+        subdict['adverb']['suf'+letters] = []
+    for elements in data[i]['items']:
+        #print (elements['item'], pronunciation(elements['item'].lower()))
+        elements['pronunciation']=pronunciation(elements['item'].lower())
+        subdict[elements['pos']][helper_upper(elements['pronunciation'][0])].append(elements)
+        subdict[elements['pos']]['suf'+helper_upper(elements['pronunciation'][-1])].append(elements)
+    waset.append(subdict)
+
+#for i in range(num):
+#    params = {
+#        'apikey': apikey,
         #'text': text_,
-        'text' : kws[i],
-        'lang': lang_
-    }
-    res = requests.get(url, params=params)
+#        'text' : kws[i],
+#        'lang': lang_
+#    }
+#    res = requests.get(url, params=params)
 # res.json() produces all data like
 # {'response':
 # 	[{'text': 'welcome',
@@ -42,7 +118,7 @@ for i in range(num):
 # }
 
 # start parsing
-
+"""
     data = res.json()['response']
     subdict = {'text':data[0]['text'],'noun':{}, 'adjective':{},'verb':{}, 'adverb':{}}
     for letters in alphabet:
@@ -58,9 +134,9 @@ for i in range(num):
         subdict[elements['pos']][elements['item'][0]].append(elements)
         subdict[elements['pos']]['suf'+elements['item'][-1].upper()].append(elements)
     waset.append(subdict)
-
-print(waset)
-print(waset[0]['text'], waset[1]['text'], waset[2]['text'])
+"""
+#print(waset)
+#print(waset[0]['text'], waset[1]['text'], waset[2]['text'])
 
 alliteration = {}
 similarity_level = 'NLMH'
@@ -70,10 +146,10 @@ for x in range(num):
         if x==y:
             continue
         else:
-            alliteration[kws[x]+','+kws[y]]={'front':{'ADJ+N':{'L':[],'M':[],'H':[]},'N+N':{'L':[],'M':[],'H':[]},'N+ADJ':{'L':[],'M':[],'H':[]}}, 'back':{'ADJ+N':{'L':[],'M':[],'H':[]},'N+N':{'L':[],'M':[],'H':[]},'N+ADJ':{'L':[],'M':[],'H':[]}}}
-print(alliteration)
+            alliteration[kws[x]+','+kws[y]]={'front':{'ADJ+N':{'N':[],'L':[],'M':[],'H':[]},'N+N':{'N':[],'L':[],'M':[],'H':[]},'N+ADJ':{'N':[],'L':[],'M':[],'H':[]}}, 'back':{'ADJ+N':{'N':[],'L':[],'M':[],'H':[]},'N+N':{'N':[],'L':[],'M':[],'H':[]},'N+ADJ':{'N':[],'L':[],'M':[],'H':[]}}}
+#print(alliteration)
 
-#fronts
+# Merging
 for x in range(num):
     for y in range(x,num):
         if x==y:
@@ -82,6 +158,7 @@ for x in range(num):
             for letters in alphabet:
                 first = ""
                 second = ""
+                letters=helper_upper(letters)
                 first_adj_num = len(waset[x]['adjective'][letters])
                 first_noun_num = len(waset[x]['noun'][letters])
                 second_adj_num = len(waset[y]['adjective'][letters])
@@ -97,35 +174,47 @@ for x in range(num):
                 if (first_adj_num * second_noun_num != 0):
                     for first_item in waset[x]['adjective'][letters]:
                         first = first_item['item']
+                        first_p = first_item['pronunciation']
                         for second_item in waset[y]['noun'][letters]:
                             second = second_item['item']
+                            second_p = second_item['pronunciation']
                             cnt = 0
-                            for i in range(min(len(first), len(second), 3)):
-                                if first[i] == second[i]:
+                            for i in range(min(len(first_p), len(second_p), 3)):
+                                if first_p[i] == second_p[i]:
                                     cnt = cnt + 1
-                            alliteration[kws[x]+','+kws[y]]['front']['ADJ+N'][similarity_level[cnt]].append(first + " " + second)
+                                else: break
+
+                            alliteration[kws[x] + ',' + kws[y]]['front']['ADJ+N'][similarity_level[cnt]].append(first + " " + second + " " + str(first_p[:cnt]))
+
                 # noun+noun
                 if (first_noun_num * second_noun_num != 0):
                     for first_item in waset[x]['noun'][letters]:
                         first = first_item['item']
+                        first_p = first_item['pronunciation']
                         for second_item in waset[y]['noun'][letters]:
                             second = second_item['item']
+                            second_p = second_item['pronunciation']
                             cnt = 0
-                            for i in range(min(len(first), len(second), 3)):
-                                if first[i] == second[i]:
+                            for i in range(min(len(first_p), len(second_p), 3)):
+                                if first_p[i] == second_p[i]:
                                     cnt = cnt + 1
-                            alliteration[kws[x]+','+kws[y]]['front']['N+N'][similarity_level[cnt]].append(first + " " + second)
+                                else: break
+                            alliteration[kws[x] + ',' + kws[y]]['front']['N+N'][similarity_level[cnt]].append(first + " " + second + " " + str(first_p[:cnt]))
+
                 # noun+adj
                 if (first_noun_num * second_adj_num != 0):
                     for first_item in waset[x]['noun'][letters]:
                         first = first_item['item']
+                        first_p = first_item['pronunciation']
                         for second_item in waset[y]['adjective'][letters]:
                             second = second_item['item']
+                            second_p = second_item['pronunciation']
                             cnt = 0
-                            for i in range(min(len(first), len(second), 3)):
-                                if first[i] == second[i]:
+                            for i in range(min(len(first_p), len(second_p), 3)):
+                                if first_p[i] == second_p[i]:
                                     cnt = cnt + 1
-                            alliteration[kws[x]+','+kws[y]]['front']['N+ADJ'][similarity_level[cnt]].append(first + " " + second)
+                                else: break
+                            alliteration[kws[x] + ',' + kws[y]]['front']['N+ADJ'][similarity_level[cnt]].append(first + " " + second + " " + str(first_p[:cnt]))
 
                 # back
                 # adj+noun ,noun+noun, noun+adj
@@ -133,36 +222,47 @@ for x in range(num):
                 if (suf_first_adj_num * suf_second_noun_num != 0):
                     for first_item in waset[x]['adjective']['suf'+letters]:
                         first = first_item['item']
+                        first_p = first_item['pronunciation']
                         for second_item in waset[y]['noun']['suf'+letters]:
                             second = second_item['item']
+                            second_p = second_item['pronunciation']
                             cnt = 0
-                            for i in range(min(len(first), len(second), 3)):
-                                if first[-1-i] == second[-1-i]:
+                            for i in range(min(len(first_p), len(second_p), 3)):
+                                if first_p[-1-i] == second_p[-1-i]:
                                     cnt = cnt + 1
-                            alliteration[kws[x]+','+kws[y]]['back']['ADJ+N'][similarity_level[cnt]].append(first + " " + second)
+                                else: break
+                            if not (cnt==1 and first_p[-1]==":"):
+                                alliteration[kws[x]+','+kws[y]]['back']['ADJ+N'][similarity_level[cnt]].append(first + " " + second+" "+str(first_p[-cnt:]))
 
                 if (suf_first_noun_num * suf_second_noun_num != 0):
                     for first_item in waset[x]['noun']['suf'+letters]:
                         first = first_item['item']
+                        first_p = first_item['pronunciation']
                         for second_item in waset[y]['noun']['suf'+letters]:
                             second = second_item['item']
+                            second_p = second_item['pronunciation']
                             cnt = 0
-                            for i in range(min(len(first), len(second), 3)):
-                                if first[-1-i] == second[-1-i]:
+                            for i in range(min(len(first_p), len(second_p), 3)):
+                                if first_p[-1-i] == second_p[-1-i]:
                                     cnt = cnt + 1
-                            alliteration[kws[x]+','+kws[y]]['back']['N+N'][similarity_level[cnt]].append(first + " " + second)
+                                else: break
+                            if not (cnt==1 and first_p[-1]==":"):
+                                alliteration[kws[x]+','+kws[y]]['back']['N+N'][similarity_level[cnt]].append(first + " " + second+" "+str(first_p[-cnt:]))
 
                 if (suf_first_noun_num * suf_second_adj_num != 0):
                     for first_item in waset[x]['noun']['suf'+letters]:
                         first = first_item['item']
+                        first_p = first_item['pronunciation']
                         for second_item in waset[y]['adjective']['suf'+letters]:
                             second = second_item['item']
+                            second_p = second_item['pronunciation']
                             cnt = 0
-                            for i in range(min(len(first), len(second), 3)):
-                                if first[-1-i] == second[-1-i]:
+                            for i in range(min(len(first_p), len(second_p), 3)):
+                                if first_p[-1-i] == second_p[-1-i]:
                                     cnt = cnt + 1
-                            alliteration[kws[x]+','+kws[y]]['back']['N+ADJ'][similarity_level[cnt]].append(first + " " + second)
-
+                                else: break
+                            if not (cnt==1 and first_p[-1]==":"):
+                                alliteration[kws[x]+','+kws[y]]['back']['N+ADJ'][similarity_level[cnt]].append(first + " " + second+" "+str(first_p[-cnt:]))
 
 print (alliteration)
 

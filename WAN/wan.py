@@ -1,7 +1,3 @@
-Word
-Associations
-Network
-API
 # Making XML Query
 
 import urllib.request
