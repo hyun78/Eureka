@@ -79,12 +79,17 @@ def clear_parser(filepath, stereotype = None ,stereotype_2 = None):
                             item.pop(i)
                     if len(item) > 0:
                         parsing.append(''.join(item).strip())
+
+        # Afterworks : remove 2-word stereotypes first,
+        # and then remove the series name (ex. super action hero 3 -> super action hero)
         if len(parsing) > 0:
             if len(parsing) >= 3 and ' '.join(parsing[-2:]).upper() in stereotype_2:
                 parsing = parsing[:-2]
             if len(parsing[-1]) == 1 and 48 <= parsing[-1].encode("utf-8")[0] <= 57:
                 parsing.pop()
-            list_title.append(' '.join(parsing))
+            list_title.append({'title':' '.join(parsing), 'downloads':sets['downloads_min'], 'rating':sets['rating']})
+        else:
+            list_title.append({'title': 'Adversal_input', 'downloads':sets['downloads_min'], 'rating':sets['rating']})
     return list_title
 
 #for test
