@@ -11,15 +11,22 @@ def read_json_file(filename):
    return data
 
 def isnumoral(input):
+    # 0~9
     if 48<=input and input<=57:
         return True
+    # Capital letters
     if 65<=input and input<=90:
         return True
+    # Little letters
     if 97<=input and input <=122:
+        return True
+    # ' .
+    if input == 39 or input == 46:
         return True
     return False
 
 stereotype = ['LINE', '(LITE)','LITE','(Lite)','(FREE)','(Free)','FREE','Free', '3D', 'HD','(Classic)']
+#Pro? (iGun Pro)
 stereotype_2 = ['FOR KAKAO']
 
 filename = "./arcade.json"
@@ -51,7 +58,7 @@ def clear_parser(filepath, stereotype = None ,stereotype_2 = None):
                 continue
 
             # remove additional information
-            # remove the sub-title by recognizing speacial words
+            # remove the sub-title by recognizing special words
             item_encode = item.encode("utf-8")
             if not isnumoral(item_encode[-1]):
                 # print(item, item[-1])
