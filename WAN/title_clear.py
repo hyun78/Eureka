@@ -212,19 +212,14 @@ def make_stat(list_title):
         for pattern_key in dict_statistics[desc_word].keys():
             desc_word = desc_word.lower()
             pattern_key = pattern_key.lower()
-
-            if(pattern_key not in cnt_statistics.keys()):
-                print ('XX', pattern_key)
-                continue
+            print (desc_word, pattern_key)
             local_pos_seqs = cnt_statistics[desc_word + '_' + pattern_key].keys()
             global_pos_seqs = cnt_statistics[pattern_key].keys()
-
             for local_pos in local_pos_seqs:
-                local_pos = local_pos.lower()
+                print (local_pos)
                 local_pos_index = local_pos + '_local'
                 dict_statistics[desc_word][pattern_key][local_pos_index] = cnt_statistics[desc_word+'_'+pattern_key][local_pos]
             for global_pos in global_pos_seqs:
-                global_pos = global_pos.lower()
                 global_pos_index = global_pos + '_global'
                 dict_statistics[desc_word][pattern_key][global_pos_index] = cnt_statistics[pattern_key][global_pos]
 
@@ -235,6 +230,7 @@ def make_stat(list_title):
 def sectiondata_save_json(datafiles_dir, savefile_name,stereotype, stereotype_2):
     testfile_list = select_section(datafiles_dir, 'arcade')
     total_dict = clear_parser(testfile_list,stereotype,stereotype_2)
+    make_stat(total_dict)
     with open(savefile_name+'.json', 'w') as fp:
         json.dump(make_stat(total_dict), fp)
 
