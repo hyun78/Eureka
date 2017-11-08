@@ -3,18 +3,46 @@
 # Making XML Query
 
 import urllib.request
-from bs4 import BeautifulSoup
 from urllib import parse
 import re
 import requests
 from wan import *
-from Vocabulary_104.vocabulary.vocabulary import Vocabulary as vb
 from time import time as t
+
+#Global variables
+#dictionary of pronunciation in English
+pronunciation_dict ={
+'0251' :'ɑ','0253' :'ɓ', '0254' :'ɔ',
+#'0255' :'ɕ', '0256' :'ɖ', '0257' :'ɗ',
+'0258' :'ɘ', '0259' :'ə',
+#'025A' :'ɚ',
+'025B' :'ɛ', '025C' :'ɜ',
+#'025D' :'ɝ', '025E' :'ɞ', '025F' :'ɟ', '0260' :'ɠ', '0261' :'ɡ', '0262' :'ɢ', '0263' :'ɣ', '0264' :'ɤ','0265' :'ɥ', '0266' :'ɦ', '0267' :'ɧ', '0268' :'ɨ', '0269' :'ɩ',
+#'026A' :'ɪ', '026B' :'ɫ', '026C' :'ɬ', '026D' :'ɭ', '026E' :'ɮ', '026F' :'ɯ',
+#'0270' :'ɰ', '0271' :'ɱ', '0272' :'ɲ',
+'0273' :'ɳ', #'0274' :'ɴ',
+#'0275' :'ɵ', '0276' :'ɶ', '0277' :'ɷ', '0278' :'ɸ', '0279' :'ɹ',
+#'027A' :'ɺ', '027B' :'ɻ', '027C' :'ɼ', '027D' :'ɽ', '027E' :'ɾ', '027F' :'ɿ',
+#'0280' :'ʀ', '0281' :'ʁ', '0282' :'ʂ',
+'0283' :'ʃ',
+#'0284' :'ʄ', '0285' :'ʅ', '0286' :'ʆ', '0287' :'ʇ', '0288' :'ʈ', '0289' :'ʉ', '028A' :'ʊ', '028B' :'ʋ',
+'028C' :'ʌ',
+#'028D' :'ʍ', '028E' :'ʎ', '028F' :'ʏ', '0290' :'ʐ', '0291' :'ʑ', '0292' :'ʒ', '0293' :'ʓ', '0294' :'ʔ','0295' :'ʕ', '0296' :'ʖ', '0297' :'ʗ', '0298' :'ʘ', '0299' :'ʙ',
+#'029A' :'ʚ', '029B' :'ʛ', '029C' :'ʜ', '029D' :'ʝ', '029E' :'ʞ', '029F' :'ʟ',
+#'02A0' :'ʠ', '02A1' :'ʡ', '02A2' :'ʢ',
+'02A3' :'ʣ', '02A4' :'ʤ',
+#'02A5' :'ʥ', '02A6' :'ʦ', '02A7' :'ʧ', '02A8' :'ʨ', '02A9' :'ʩ',
+#'02AA' :'ʪ', '02AB' :'ʫ', '02AC' :'ʬ', '02AD' :'ʭ', '02AE' :'ʮ', '02AF' :'ʯ',
+'00E6' : 'æ', '03B8' : 'θ'
+}
+start_time = 0
+end_time = 0
 
 # Helper functions
 # get pronunciation from input_word
 def pronunciation(input_word):
     url_test = "http://texttophonetic.appspot.com/ipa?c="
+    # can be imporved.
     request = urllib.request.Request(url_test+input_word)
     data = str(urllib.request.urlopen(request).read().decode()) #UTF-8 encode
     data = data[0:-1] # erase last space
@@ -42,40 +70,26 @@ def helper_upper(word):
         return word.upper()
     return word
 
-#dictionary of pronunciation in English
-pronunciation_dict ={
-'0251' :'ɑ','0253' :'ɓ', '0254' :'ɔ',
-#'0255' :'ɕ', '0256' :'ɖ', '0257' :'ɗ',
-'0258' :'ɘ', '0259' :'ə',
-#'025A' :'ɚ',
-'025B' :'ɛ', '025C' :'ɜ',
-#'025D' :'ɝ', '025E' :'ɞ', '025F' :'ɟ', '0260' :'ɠ', '0261' :'ɡ', '0262' :'ɢ', '0263' :'ɣ', '0264' :'ɤ','0265' :'ɥ', '0266' :'ɦ', '0267' :'ɧ', '0268' :'ɨ', '0269' :'ɩ',
-#'026A' :'ɪ', '026B' :'ɫ', '026C' :'ɬ', '026D' :'ɭ', '026E' :'ɮ', '026F' :'ɯ',
-#'0270' :'ɰ', '0271' :'ɱ', '0272' :'ɲ',
-'0273' :'ɳ', #'0274' :'ɴ',
-#'0275' :'ɵ', '0276' :'ɶ', '0277' :'ɷ', '0278' :'ɸ', '0279' :'ɹ',
-#'027A' :'ɺ', '027B' :'ɻ', '027C' :'ɼ', '027D' :'ɽ', '027E' :'ɾ', '027F' :'ɿ',
-#'0280' :'ʀ', '0281' :'ʁ', '0282' :'ʂ',
-'0283' :'ʃ',
-#'0284' :'ʄ', '0285' :'ʅ', '0286' :'ʆ', '0287' :'ʇ', '0288' :'ʈ', '0289' :'ʉ', '028A' :'ʊ', '028B' :'ʋ',
-'028C' :'ʌ',
-#'028D' :'ʍ', '028E' :'ʎ', '028F' :'ʏ', '0290' :'ʐ', '0291' :'ʑ', '0292' :'ʒ', '0293' :'ʓ', '0294' :'ʔ','0295' :'ʕ', '0296' :'ʖ', '0297' :'ʗ', '0298' :'ʘ', '0299' :'ʙ',
-#'029A' :'ʚ', '029B' :'ʛ', '029C' :'ʜ', '029D' :'ʝ', '029E' :'ʞ', '029F' :'ʟ',
-#'02A0' :'ʠ', '02A1' :'ʡ', '02A2' :'ʢ',
-'02A3' :'ʣ', '02A4' :'ʤ',
-#'02A5' :'ʥ', '02A6' :'ʦ', '02A7' :'ʧ', '02A8' :'ʨ', '02A9' :'ʩ',
-#'02AA' :'ʪ', '02AB' :'ʫ', '02AC' :'ʬ', '02AD' :'ʭ', '02AE' :'ʮ', '02AF' :'ʯ',
-'00E6' : 'æ', '03B8' : 'θ'
-}
+def elapsed():
+    global start_time
+    global end_time
+    if (start_time==0 and end_time ==0):
+        return "Work not done yet"
+    return end_time - start_time
 
+# ----------------------------------------------
+
+#MAIN FUNCTION
 def alliterate(kws):
+    global start_time
+    global end_time
+    start_time = t()
     num = len(kws)
     # some useful constant lists
     alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     pron_alpha = list(pronunciation_dict.values())
     alphabet = alphabet + pron_alpha + [":"]
     # elapsed time checker - start time
-    start_time = t()
 
     apikey = "9abec642-54e8-496a-9784-c98d0a428772"  # about key...
     url = "https://api.wordassociations.net/associations/v1.0/json/search?"
@@ -273,12 +287,13 @@ def alliterate(kws):
                                     alliteration[kws[x]+','+kws[y]]['back']['N+ADJ'][similarity_level[cnt]].append(first + " " + second+" "+str(first_p[-cnt:]))
     # elapsed time checker - end time
     end_time = t()
-    print(end_time - start_time)
+    #print(end_time - start_time)
     return alliteration
 
 #test
 keywords = ["halal","vegetable","lunch"] #input for test
 print(alliterate(keywords))
+print(elapsed())
 
 #for elem in data:  # because it can response multiple keywords,
 #    keywords = elem['text']
