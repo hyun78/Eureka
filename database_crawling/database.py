@@ -48,7 +48,7 @@ def data_savefile(filename,start,end):
 		collection+=res['results']
 		res = get_data(category,start,limit)
 		time.sleep(1)
-		print("try : ",start," ~ ",start+limit)
+		print("try : ",start-limit," ~ ",start)
 
 	total = {}
 	total['items'] = collection
