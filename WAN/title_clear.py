@@ -235,9 +235,10 @@ def sectiondata_save_json(datafiles_dir, savefile_name,stereotype, stereotype_2)
         json.dump(make_stat(total_dict), fp)
 
 #for test
-datafiles_dir='database_crawling'
-#testfile_list = select_section(datafiles_dir, 'arcade')
-#print(len(clear_parser(testfile_list,stereotype,stereotype_2)))
-#print(clear_parser(testfile_list,stereotype,stereotype_2))
-sectiondata_save_json(datafiles_dir, 'data_arcade', stereotype, stereotype_2)
+if __name__=='__main__':
+    datafiles_dir='database_crawling'
+    #testfile_list = select_section(datafiles_dir, 'arcade')
+    #print(len(clear_parser(testfile_list,stereotype,stereotype_2)))
+    #print(clear_parser(testfile_list,stereotype,stereotype_2))
+    sectiondata_save_json(datafiles_dir, 'data_arcade', stereotype, stereotype_2)
 

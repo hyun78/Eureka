@@ -5,11 +5,8 @@ FILE_NAME = 'data_arcade.json' # pre-defined file name
 from collections import OrderedDict
 import json
 import random
-def read_json_file(filename):
-   data = None
-   with open(filename, encoding="utf-8") as data_file:
-      data = json.load(data_file, object_pairs_hook=OrderedDict)
-   return data
+from title_clear import *
+
 #keyword가 가지는 가장 많은 title suffix/infix/prefix 단어 추출
 def read_database(filename):
 	data = read_json_file(filename)
