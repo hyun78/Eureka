@@ -6,7 +6,7 @@ from collections import OrderedDict
 import json
 import random
 from title_clear import *
-
+from wan import *
 #keyword가 가지는 가장 많은 title suffix/infix/prefix 단어 추출
 def read_database(filename):
 	data = read_json_file(filename)
@@ -56,7 +56,7 @@ def extract_item(templete):
 		return ''
 	return ''
 #words sets 은 list로 주어진다
-def combine_name_with_templete(templete,word_sets,word_length):
+def combine_name_with_templete(templete,word_set,word_length):
 	tag_ = type_casting(templete)
 	item = extract_item(templete)
 	n = 10
@@ -64,17 +64,17 @@ def combine_name_with_templete(templete,word_sets,word_length):
 	
 	if (tag_ =='pre'):
 		for i in range(n):
-			wlst = pick_n_word_from_word_list(word_sets,word_length)
+			wlst = pick_n_word_from_word_list(word_set,word_length-1)
 			combined_word = generate_prefix_word(item,wlst)
 			combined_words.append(combined_word)
 	elif(tag_ =='mid'):
 		for i in range(n):	
-			wlst = pick_n_word_from_word_list(word_sets,word_length)
+			wlst = pick_n_word_from_word_list(word_set,word_length-1)
 			random_index = random.randint(0,word_length-1)
 			combined_word = generate_inffix_word(item,wlst,random_index)
 	elif(tag_ =='suf'):
 		for i in range(n):	
-			wlst = pick_n_word_from_word_list(word_sets,word_length)
+			wlst = pick_n_word_from_word_list(word_set,word_length-1)
 			combined_word = generate_suffix_word(item,wlst)
 			combined_words.append(combined_word)
 	else:
@@ -102,16 +102,29 @@ def generate_inffix_word(item,wlst,idx):
 			res+= (item+ ' ')
 			res += (w + ' ')
 	return res
-def pick_n_word_from_word_list(word)
+def pick_n_word_from_word_list(word_set,n):
+	lst = [i for i in range(len(word_set))]
+	res = []
+	for j in range(n):
+		res.append(word_set[lst.pop(random.randint(0,len(lst)-1))])
+
+	return res
+def make_list(wan_res):
+	res = []
+	for r in wan_res:
+		for item in r['items']:
+			res.append(item['item'])
+	return res
+
 def main_routine():
 	data = read_database(FILE_NAME)
-	example_keywords = ['chocolate','candy','shoot']
-	related_word_list = ['Cookie','cream','crunch','cracker','sweet','crush','sniper','blaster','kill']
+	example_keywords = ['magic','blood','shoot']
+	related_word_list = make_list(search_WAN(example_keywords))
 	print("example keywords: ",example_keywords)
 	for key in example_keywords:
 		templete = max_key_extraction_keyword(data,key)
 		print("keyword : ",key,"\nmost used : ",templete)
-		print("generated names:",combine_name_with_templete(templete,related_word_list))
+		print("generated names:",combine_name_with_templete(templete,related_word_list,3))
 
 	
 	
