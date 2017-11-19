@@ -1,14 +1,21 @@
 import glove
 import numpy as np
 from title_clear import *
-
+import functools
 CATEGORIES = [
 			'human animal bird',
 			'kind soft familiar',
 			'machine robot technical architecture building',
-			'adventure explore hunt hunter treasure',
-			'speed dash fast run race jump warp']
+			'fantasy adventure explore hunt hunter treasure',
+			'speed dash fast run race jump warp',
+			'ball roll bounce circle',
+			'song music classic rhythm sound piano',
+			'horror zombie blaxploitation'
+			]
 THREASHOLD = [
+			0.4,
+			0.4,
+			0.4,
 			0.4,
 			0.4,
 			0.4,
@@ -41,9 +48,9 @@ def read_glove_file(filename):
 def classify_word(g,input_word):
 	type_class = [0 for i in range((len(CATEGORIES)))]
 	try:
-		print(input_word)
+		
 		input_word_idx = g.dictionary[input_word]
-		print(input_word_idx,input_word)
+		
 		for i in range(len(CATEGORY_MAP)):
 			maps = CATEGORY_MAP[i]
 			for map_ in maps:
@@ -78,13 +85,26 @@ def test_routine(testword):
 	title_list = clear_parser(select_section('database_crawling','arcade'),stereotype,stereotype_2)
 	
 	types = []
-	for title_dict in title_list[:100]:
+	for title_dict in title_list:
 		title = title_dict['title']
 		if title=='Adversal_input':
 			continue
 		temp_title = []
 		for tw in title.split():
 			temp_title.append(classify_word(GLOVE_OBJ,tw.lower()))
-			print(tw,temp_title[-1])
 		types.append([temp_title,title])
-	return types
+	#types : [list of [list of type] , title]
+	types_num =list(map(lambda t :  list( map( lambda z : ( functools.reduce(lambda x,y : x*2+y, z)), t[0] )),types))
+	type_statistics = [0 for i in range(pow(2,len((CATEGORIES))))]
+	for t in types_num:
+		for tn in t:
+				type_statistics[tn]+=1
+	return types,type_statistics
+def type_test(type_map,type_index):
+	res = []
+	for type_entry in type_map:
+		for te in type_entry[0]:
+			if functools.reduce(lambda x,y : x*2+y, te)==type_index:
+				res.append(type_entry[1])
+				break
+	return res
