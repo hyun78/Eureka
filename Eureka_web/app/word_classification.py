@@ -87,29 +87,46 @@ def test_routine(testword):
 	types = []
 	for title_dict in title_list:
 		title = title_dict['title']
-		#titlelen = title_dict['length'] 안동이 할 것이다.  
+		title_len = title_dict['length'] # 안동이 할 것이다.  
 		if title=='Adversal_input':
 			continue
 		temp_title = []
 		for tw in title.split():
 			temp_title.append(classify_word(GLOVE_OBJ,tw.lower()))
-		
-		types.append([temp_title,title])
+
+		types.append([temp_title,title_len,title])
 	#types : [list of [list of type] , title] 
 	# ex : title = cookie run ->  types = [[[[0,1,1] ,[1,0,0]], cookie run] , [[[0,1,1] ,[1,0,0]], cookie run] , [[[0,1,1] ,[1,0,0]], cookie run]]
-	# type_statistics --> type_statistics[type_number] = number of type_number's instance
-	# 
-	types_num =list(map(lambda t :  list( map( lambda z : ( functools.reduce(lambda x,y : x*2+y, z)), t[0] )),types))
-	type_statistics = [0 for i in range(pow(2,len((CATEGORIES))))]
-	for t in types_num:
-		for tn in t:
-				type_statistics[tn]+=1
+	# now : types =  [ [ [[0,1,1], [1,0,0]], 2, cookie run ], [ [[0,1,1], [1,0,0]], 2, cookie run ] , [ [[0,1,1], [1,0,0]], 2, cookie run ] ...]
+	# type_statistics --> type_statistics[type_number] = number of type_number's instance ; [0,1,1] => 3.   [1,0,0] => 4
+	# now : type number  = [ [[0,1,1],[1,0,0]],2 ] => 342  즉 마지막자리는 글자 수 
+	type_statistics = generate_type_statistics(types)
 	return types,type_statistics
-def type_test(type_map,type_index):
-	res = []
-	for type_entry in type_map:
-		for te in type_entry[0]:
-			if functools.reduce(lambda x,y : x*2+y, te)==type_index:
-				res.append(type_entry[1])
-				break
-	return res
+
+def generate_type_statistics(types_list):
+	types_statistics = {}
+	for type_entity in type_list:
+		word_type_list = type_entity[0]
+		title_len = type_entity[1]
+		title = type_entity[2]
+		tn = type_num_calculate(word_type_list,title_len)
+		try:
+			types_statistics[tn][0]+=1
+			types_statistics[tn][1].append(title)
+		except:
+			types_statistics[tn] = [1,[title]]
+
+	return types_statistics
+def type_num_calculate(word_type_list, title_len):
+	wtlst = []
+	temp = []
+	for wt in word_type_list:
+		temp.append( int(''.join(str(i) for i in wt), 2) )
+	# now temp = list of typenum
+	# ex : input=  [[1,1,1], [1,0,0]] => [7, 4]
+	# type num is a string, 'typenums'+str(title_len)
+	temp.append(title_len)
+	type_num = ''.join(str(i) for i in temp)
+	return type_num
+
+
