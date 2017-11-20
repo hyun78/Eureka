@@ -87,13 +87,18 @@ def test_routine(testword):
 	types = []
 	for title_dict in title_list:
 		title = title_dict['title']
+		#titlelen = title_dict['length'] 안동이 할 것이다.  
 		if title=='Adversal_input':
 			continue
 		temp_title = []
 		for tw in title.split():
 			temp_title.append(classify_word(GLOVE_OBJ,tw.lower()))
+		
 		types.append([temp_title,title])
-	#types : [list of [list of type] , title]
+	#types : [list of [list of type] , title] 
+	# ex : title = cookie run ->  types = [[[[0,1,1] ,[1,0,0]], cookie run] , [[[0,1,1] ,[1,0,0]], cookie run] , [[[0,1,1] ,[1,0,0]], cookie run]]
+	# type_statistics --> type_statistics[type_number] = number of type_number's instance
+	# 
 	types_num =list(map(lambda t :  list( map( lambda z : ( functools.reduce(lambda x,y : x*2+y, z)), t[0] )),types))
 	type_statistics = [0 for i in range(pow(2,len((CATEGORIES))))]
 	for t in types_num:
