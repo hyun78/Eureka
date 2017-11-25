@@ -108,7 +108,7 @@ def test_routine(testword):
 		nondict_cnt = 0
 		for tw in title.split():
 			try:
-				twidx = glove_obj.dictionary[tw]
+				twidx = GLOVE_OBJ.dictionary[tw.lower()]
 			except:
 				#print("no word exsit as {}".format(word))
 				nondict_cnt = nondict_cnt +1
@@ -159,10 +159,11 @@ def type_num_calculate(word_type_list, title_len):
 	type_num = ''.join(str(i) for i in temp)
 	return type_num
 
-bigdic, type_statistics = test_routine('')
-print (bigdic)
-print ('---------------------------------------------')
-print (type_statistics)
+if __name__=='__main__':
+	bigdic, type_statistics = test_routine('')
+	print (bigdic)
+	print ('---------------------------------------------')
+	print (type_statistics)
 '''
 for x in type_statistics[2].items():
 	print(x[1][0], x[0])
