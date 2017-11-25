@@ -13,7 +13,7 @@ import time
 # password:qq
 # salt:9wbqKZMxZ19te6s8D
 # anti_csrf_token:7b5b0a3adbac5103ed08f0e9bdec1391a7ff30b1
-AUTH_TOKEN = '0bad9f919afadcea38e5ac14c655c5a9e2ff070d'
+AUTH_TOKEN = 'f1abe3b2031ca7a5d68afb16a3d6b8fbe9b6b857'
 
 
 def get_data(category,start,limit):
