@@ -48,7 +48,9 @@ def isnumoral(input):
         return True
     return False
 
-stereotype = ['LINE', '(LITE)','LITE','(Lite)','(FREE)','(Free)','FREE','Free', '3D', 'HD','(Classic)']
+stereotype = ['LINE', '(LITE)','LITE','(Lite)','(FREE)','(Free)','FREE','Free', '3D', 'HD','(Classic)','VR','2D','HD','2HD', 'Pro','AR']
+stereotype = stereotype + list(range(1900,2019))
+
 #Pro? (iGun Pro)
 stereotype_2 = ['FOR KAKAO']
 dict_statistics = {}
@@ -76,8 +78,8 @@ def short_desc_parser(str_desc):
 
 def clear_parser(filepath_list, stereotype = None ,stereotype_2 = None):
     #settings for stereotypes
-    stereotype = list(map(lambda x: x.upper(),stereotype))
-    stereotype_2 = list(map(lambda x: x.upper(), stereotype_2))
+    stereotype = list(map(lambda x: str(x).upper(),stereotype))
+    stereotype_2 = list(map(lambda x: str(x).upper(), stereotype_2))
 
     #the result list
     list_title = []
@@ -124,8 +126,10 @@ def clear_parser(filepath_list, stereotype = None ,stereotype_2 = None):
                         item = list(item)
                         for i in range(len(item))[::-1]:
                             #here, remove ' and . too
-                            if item_encode[i]==39 or item_encode[i]==46 or not isnumoral(item_encode[i]):
-                                item.pop(i)
+                            #if item_encode[i]==39 or item_encode[i]==46 or not isnumoral(item_encode[i]):
+                            #    item.pop(i)
+                            if isnumoral(item_encode[i]):
+                                item =''
 
                         if len(item) > 0:
                             parsing.append(''.join(item).strip())
@@ -139,13 +143,17 @@ def clear_parser(filepath_list, stereotype = None ,stereotype_2 = None):
                 if len(parsing[-1]) == 1 and 48 <= parsing[-1].encode("utf-8")[0] <= 57:
                     parsing.pop()
                 # print (short_desc_parser(sets['short_desc']) if 'short_desc' in sets.keys() else None)
-                list_title.append(
-                    {'title': ' '.join(parsing), 'downloads': sets['downloads_min'], 'rating': sets['rating'],
-                     'short_desc': short_desc_parser(sets['short_desc']) if 'short_desc' in sets.keys() else None})
-            else:
-                list_title.append(
-                    {'title': 'Adversal_input', 'downloads': sets['downloads_min'], 'rating': sets['rating'],
-                     'short_desc': short_desc_parser(sets['short_desc']) if 'short_desc' in sets.keys() else None})
+                list_title.append({'title' : ' '.join(parsing)})
+                #
+                #{'title': ' '.join(parsing), 'downloads': sets['downloads_min'], 'rating': sets['rating'],
+                #    'short_desc': short_desc_parser(sets['short_desc']) if 'short_desc' in sets.keys() else None}
+
+            #else:
+                #"""
+                #list_title.append(
+                #    {'title': 'Adversal_input', 'downloads': sets['downloads_min'], 'rating': sets['rating'],
+                #     'short_desc': short_desc_parser(sets['short_desc']) if 'short_desc' in sets.keys() else None})
+                #"""
     return list_title
 
 
