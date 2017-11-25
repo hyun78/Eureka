@@ -126,10 +126,10 @@ def clear_parser(filepath_list, stereotype = None ,stereotype_2 = None):
                         item = list(item)
                         for i in range(len(item))[::-1]:
                             #here, remove ' and . too
-                            #if item_encode[i]==39 or item_encode[i]==46 or not isnumoral(item_encode[i]):
-                            #    item.pop(i)
-                            if isnumoral(item_encode[i]):
-                                item =''
+                            if item_encode[i]==39 or item_encode[i]==46 or not isnumoral(item_encode[i]):
+                                item.pop(i)
+                            #if isnumoral(item_encode[i]):
+                            #    item =''
 
                         if len(item) > 0:
                             parsing.append(''.join(item).strip())

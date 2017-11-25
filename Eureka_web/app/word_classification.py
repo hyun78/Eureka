@@ -1,6 +1,6 @@
 import glove
 import numpy as np
-from title_clear import *
+from title_clear_v2 import *
 import functools
 from nltk.stem import WordNetLemmatizer as lt
 CATEGORIES = [
@@ -86,52 +86,17 @@ def similarity_query(glove_obj, word_vec, category_word_idx):
 		return dst[category_word_idx]
 	else:
 		return False
-GLOVE_OBJ = read_glove_file('gf')
-CATEGORY_MAP = list(map( lambda x: generate_category_map(GLOVE_OBJ,CATEGORIES[x],THREASHOLD[x]),range(len(CATEGORIES) )))
+#GLOVE_OBJ = read_glove_file('gf')
+#CATEGORY_MAP = list(map( lambda x: generate_category_map(GLOVE_OBJ,CATEGORIES[x],THREASHOLD[x]),range(len(CATEGORIES) )))
 
-def test_routine(testword):
-	type_vector = classify_word(GLOVE_OBJ,testword)
-	print("type of {} is {}".format(testword,type_vector))
-	title_list = clear_parser(select_section('database_crawling','arcade'),stereotype,stereotype_2)
-	print(title_list)
-	max_title_len = 10
-	#types = [[] for i in range(max_title_len)]
-	bigdic = {}
-	for i in range(max_title_len):
-		bigdic[str(i)] = [[] for i in range(max_title_len)]
-	for title_dict in title_list:
-		title = title_dict['title']
-		title_len = len(title.split()) # 안동이 할 것이다.
-		if title=='Adversal_input':
-			continue
-		temp_title = []
-		nondict_cnt = 0
-		for tw in title.split():
-			try:
-				twidx = GLOVE_OBJ.dictionary[tw.lower()]
-			except:
-				#print("no word exsit as {}".format(word))
-				nondict_cnt = nondict_cnt +1
-			temp_title.append(classify_word(GLOVE_OBJ,tw.lower()))
-
-		#types[title_len].append([temp_title,title_len,title])
-		#print(nondict_cnt, title_len, temp_title, title)
-		bigdic[str(nondict_cnt)][title_len].append([temp_title,title_len,title])
-	#types : [list of [list of type] , title]
-	# ex : title = cookie run ->  types = [[[[0,1,1] ,[1,0,0]], cookie run] , [[[0,1,1] ,[1,0,0]], cookie run] , [[[0,1,1] ,[1,0,0]], cookie run]]
-	# now : types =  [ [ [[0,1,1], [1,0,0]], 2, cookie run ], [ [[0,1,1], [1,0,0]], 2, cookie run ] , [ [[0,1,1], [1,0,0]], 2, cookie run ] ...]
-	# type_statistics --> type_statistics[type_number] = number of type_number's instance ; [0,1,1] => 3.   [1,0,0] => 4
-	# now : type number  = [ [[0,1,1],[1,0,0]],2 ] => 342  즉 마지막자리는 글자 수
-	type_statistics = []
-	for j in range(max_title_len):
-		type_statistics.append([generate_type_statistics(bigdic[str(j)][i]) for i in range(max_title_len) if len(bigdic[str(j)][i])>0])
-
-	return bigdic,type_statistics
+def test_routine():
+	print("No test is available")
+	return 
 
 def generate_type_statistics(type_list):
 	types_statistics = {}
 	for type_entity in type_list:
-		word_type_list = type_entity[0]
+		word_type_list = type_entity[0] 
 		title_len = type_entity[1]
 		title = type_entity[2]
 		tn = type_num_calculate(word_type_list,title_len)
@@ -144,20 +109,48 @@ def generate_type_statistics(type_list):
 	return types_statistics
 
 def type_num_calculate(word_type_list, title_len):
-	wtlst = []
-	temp = []
-	for wt in word_type_list:
-		if wt[-1] == -1:
-			temp.append(-1)
-		else:
-			temp.append( int(''.join(str(i) for i in wt), 2) )
-		temp.append('_')
-	# now temp = list of typenum
-	# ex : input=  [[1,1,1], [1,0,0]] => [7, 4]
-	# type num is a string, 'typenums'+str(title_len)
-	temp.append(title_len)
-	type_num = ''.join(str(i) for i in temp)
+	
+	type_num = '_'.join(list(map(str, word_type_list))) + '_'  + str(title_len)
+	
 	return type_num
+def save_type_statistics(file_dir,target,savename):
+	#file_dir = database_crawling , target = 'arcade'
+	title_list = clear_parser(select_section('database_crawling','arcade'),2,stereotype,stereotype_2)
+	max_title_len = 10
+	#types = [[] for i in range(max_title_len)]
+	
+	cl_dict = read_cluster('clustered_dictionary.json')
+	bigdic = {}
+	for i in range(max_title_len):
+		bigdic[str(i)] = [[] for i in range(max_title_len)]
+	for title_ in title_list: # [ 1 2 3 4 .. ]
+		title = title_
+		title_len = len(title_.split()) # 안동이 할 것이다.
+		temp_title = []
+		nondict_cnt = 0
+		for tw in title.split():
+			try:
+				twidx = cl_dict[tw.lower()]
+			except:
+				#print("no word exsit as {}".format(word))
+				nondict_cnt = nondict_cnt +1
+			temp_title.append(classify_word_type2(tw.lower(),cl_dict))
+
+		#types[title_len].append([temp_title,title_len,title])
+		#print(nondict_cnt, title_len, temp_title, title)
+		bigdic[str(nondict_cnt)][title_len].append([temp_title,title_len,title])
+	#types : [list of [list of type] , title]
+	# ex : title = cookie run ->  types = [[[[0,1,1] ,[1,0,0]], cookie run] , [[[0,1,1] ,[1,0,0]], cookie run] , [[[0,1,1] ,[1,0,0]], cookie run]]
+	# now : types =  [ [ [[0,1,1], [1,0,0]], 2, cookie run ], [ [[0,1,1], [1,0,0]], 2, cookie run ] , [ [[0,1,1], [1,0,0]], 2, cookie run ] ...]
+	# type_statistics --> type_statistics[type_number] = number of type_number's instance ; [0,1,1] => 3.   [1,0,0] => 4
+	# now : type number  = [ [[0,1,1],[1,0,0]],2 ] => 342  즉 마지막자리는 글자 수
+	type_statistics = []
+	for j in range(max_title_len):
+		type_statistics.append([generate_type_statistics(bigdic[str(j)][i]) for i in range(max_title_len)])# if len(bigdic[str(j-i)][i])>0])
+		#type_statistics.append([generate_type_statistics(bigdic[str(j-i)][i]) for i in range(j+1) if len(bigdic[str(j-i)][i])>0])
+	with open(savename,'w') as f:
+		json.dump(type_statistics,f)
+	return type_statistics
 
 if __name__=='__main__':
 	bigdic, type_statistics = test_routine('')
@@ -171,3 +164,18 @@ print(type_statistics[1])
 print(type_statistics[2])
 print(type_statistics[3])
 '''
+def read_cluster(filename):
+	with open(filename) as f:
+		t = json.load(f)
+	return t
+def classify_word_type2(w,dict_):
+	#res = []
+	#for w in w_list:
+	try:
+		t = dict_[w]
+	except:
+		t = -1
+		#res.append(t)
+	#res.append(len(w_list))
+	#return '_'.join(res)
+	return t
