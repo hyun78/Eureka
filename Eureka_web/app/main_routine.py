@@ -2,6 +2,11 @@
 from wan import search_WAN
 from word_classification import *
 import numpy,random
+def setup_database():
+	file_dir,target = None ,None
+	save_type_statistics(file_dir,target,'type_statistics.json')
+	
+
 def main():
 	keyword_user = input("type keywords saperated by space\n")
 	#klst = keyword_user.split()
