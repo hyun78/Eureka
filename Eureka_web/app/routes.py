@@ -14,7 +14,12 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return render_template('home.html')
+	sections = os.listdir('database')
+	return render_template('home.html',sections=sections)
+
+@app.route('/q')
+def h2():
+	return render_template('home.html')
 
 @app.route('/search/<string:keywords>')
 def hello_world2(keywords):
@@ -33,7 +38,7 @@ def test():
 	#associated_word_set[i]['text'] = klst[i]
 	#associated_word_set[i]['text'] = klst[i]'s associated words sorted by weight
 	k = 20
-	dict_ = read_cluster('database/'+section+'/clustered_dictionary_'+section+'.json')
+	dict_ = read_cluster('database/'+section+'/clustered_dictionary.json')
 	word_dict = generate_word_dict(n,associated_words_set,k,dict_)
 	keyword_lst = []
 
@@ -63,7 +68,7 @@ def test():
 			cwn.append(str(i)+'_'+str(j)+'_2')
 		cwn.append(str(i)+'_1')
 	#cwn = ['1_3_2','2_4_2','1_1']
-	type_statistics= read_type_statistics('database/'+section+'/type_statistics_'+section+'.json')
+	type_statistics= read_type_statistics('database/'+section+'/type_statistics.json')
 	type_distribution = generate_type_distribution(type_statistics,cwn)
 	# iter_num
 	iter_num = 100
@@ -93,3 +98,13 @@ def admin_section_add(selected_section_id):
 		print("not created!")
 	sections = os.listdir('database')
 	return render_template('admin_page.html',sections=sections)
+
+@app.route('/flush_database_request')
+def admin_database_flush():
+	selected_section_id = req.args.get('selected_section_id')
+	print(selected_section_id)
+	path = 'database/'+selected_section_id
+	setup_database(selected_section_id)
+	sections = os.listdir('database')
+	return render_template('admin_page.html',sections=sections)
+	
