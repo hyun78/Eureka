@@ -1,7 +1,8 @@
 from flask import Flask,render_template
 from flask import request as req
-import time
 
+import time
+import os
 from .main_routine import *
 
 
@@ -75,3 +76,20 @@ def test():
 	res_send['names'] = res
 	res_send['section'] = section
 	return render_template('result_page.html',value=res_send)
+
+@app.route('/admin_page')
+def admin_page_view():
+	sections = os.listdir('database')
+	return render_template('admin_page.html',sections=sections)
+
+@app.route('/add_request/<string:selected_section_id>')
+def admin_section_add(selected_section_id):
+	print(selected_section_id)
+	path = 'database/'+selected_section_id
+	print(path)
+	if not os.path.isdir(path):
+		os.mkdir(path)
+	else:
+		print("not created!")
+	sections = os.listdir('database')
+	return render_template('admin_page.html',sections=sections)

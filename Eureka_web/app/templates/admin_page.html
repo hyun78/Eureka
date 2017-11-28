@@ -1,0 +1,87 @@
+<!doctype html>
+<style>
+</style>
+<title >CS408 Eureka</title>
+<div style="text-align:center">
+	<h1> CS408 Eureka </h1>
+</div>
+<div style="text-align:center">
+
+
+	데이터베이스를 flush할 섹션을 선택해 주세요 
+
+	<select id="section" size="1" >
+		<option selected>==SECTION==</option>
+		{% for section in sections %}
+			<option value={{section}}>{{section}}</option>
+			<!-- <option value={{section}}>APPLICATION MUSIC AND AUDIO</option> -->
+		{% endfor%}
+	</select>
+	<button id="serach_btn" onclick="flush_database()"> flush하기 </button>
+	<p>
+	
+	추가할 데이터베이스 섹션 ID를 입력해주세요
+	<input type="text" id="add_section_id"> 	
+	<button id="serach_btn" onclick="add_section()"> 추가하기 </button>
+	
+</div>
+
+<div style="text-align:center;">
+	<div id="loader" hidden > loading...</div>
+	<div id="result" > </div>
+</div>
+
+
+<script>
+function add_section(){
+	alert("you just press the button!");
+	var section_id = $("#add_section_id").val();
+	alert(section_id);
+	var x = document.getElementById("loader");
+	//x.style.display = 'block';
+	alert("loading...")
+	$.ajax({
+		url: "/add_request",
+		type: "GET",
+		data: {selected_section_id:section_id},
+	    complete: function() {
+	    	$('#loader').hide();
+    	},
+		success: function(response)
+		{
+			
+			$('#result').html(response);
+			$('#result').show();
+			console.log(response);
+		}
+	});
+}
+function flush_database(){
+	alert("you just press the button!");
+	var section_id = $("#section option:selected").val();
+	alert(section_id);
+	var x = document.getElementById("loader");
+	//x.style.display = 'block';
+	alert("loading...")
+	$.ajax({
+		url: "/flush_database_request",
+		type: "GET",
+		data: {selected_section_id:section_id},
+	    complete: function() {
+	    	$('#loader').hide();
+    	},
+		success: function(response)
+		{
+			
+			$('#result').html(response);
+			$('#result').show();
+			console.log(response);
+		}
+	});
+
+}
+</script>
+<script
+  src="https://code.jquery.com/jquery-3.2.1.js"
+  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
