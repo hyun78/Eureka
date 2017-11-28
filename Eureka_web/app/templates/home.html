@@ -9,8 +9,10 @@
 	섹션을 선택해 주세요 
 	<select id="section" size="1" >
 		<option selected>==SECTION==</option>
-		<option value="GAME_ARCADE">APPLICATION ARCADE</option>
-		<option value="MUSIC_AND_AUDIO">APPLICATION MUSIC AND AUDIO</option>
+		{% for section in sections %}
+			<option value={{section}}>{{section}}</option>
+			<!-- <option value={{section}}>APPLICATION MUSIC AND AUDIO</option> -->
+		{% endfor%}
 	</select>
 	<p>
 	키워드를 입력하세요(공백으로 구분):

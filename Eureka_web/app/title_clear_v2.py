@@ -58,8 +58,8 @@ def clear_parser(filepath_list, maxlen = 2, stereotype = None ,stereotype_2 = No
     list_title = []
     for filepath in filepath_list:
         for sets in read_json_file(filepath):
-            title = sets['title']
-            title_list = re.findall(r"[\w']+", title) #title names are separated in list
+            title_list = re.findall(r"[\w']+", sets['title'])
+            #title names are separated in list
 
             # print (title_list)
             # title_list = list(map(lambda x: x.strip().encode("utf-8"),title_list))
@@ -81,18 +81,39 @@ def clear_parser(filepath_list, maxlen = 2, stereotype = None ,stereotype_2 = No
 
     return list_title
 
+def clear_parser_2(filepath_list):
+    list_desc = []
+    list_s_desc = []
+    for filepath in filepath_list:
+        for sets in read_json_file(filepath):
+            try: list_desc += re.findall(r"\w+", sets['description'])
+            except: pass
+            try: list_s_desc += re.findall(r"\w+", sets['short_desc'])
+            except: pass
 
+    list_desc   = [x for x in list_desc if isal(x)]
+    list_s_desc = [x for x in list_s_desc if isal(x)]
+
+    list_desc = list(set(list_desc))
+    list_desc.sort()
+    list_s_desc = list(set(list_s_desc))
+    list_s_desc.sort()
+
+    return list_desc, list_s_desc
 
 #for test
 #l_title = clear_parser(testfile_list,stereotype,stereotype_2)
 
-def sectiondata_save_json(datafiles_dir, savefile_name,stereotype, stereotype_2):
-    testfile_list = select_section(datafiles_dir, 'arcade')
-    total_dict = clear_parser(testfile_list,2,stereotype,stereotype_2)
-    with open(savefile_name+'.json', 'w') as fp:
-        json.dump(total_dict, fp)
+def sectiondata_save_json(section, stereotype, stereotype_2):
+    testfile_list = select_section('database/'+section, section)
+    title = clear_parser(testfile_list,2,stereotype,stereotype_2)
+    desc, short_desc = clear_parser_2(testfile_list)
+
+    with open('database/'+section+'/title.json', 'w') as f: json.dump(title, f)
+    with open('database/'+section+'/description.json', 'w') as f: json.dump(desc, f)
+    with open('database/'+section+'/short_description.json', 'w') as f: json.dump(short_desc, f)
 
 #for test
 if __name__=='__main__':
-    datafiles_dir='database_crawling'
-    sectiondata_save_json(datafiles_dir, 'cp_data_arcade', stereotype, stereotype_2)
+    datafiles_dir='database'
+    sectiondata_save_json('GAME_ARCADE', datafiles_dir, stereotype, stereotype_2)

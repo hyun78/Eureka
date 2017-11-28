@@ -1,10 +1,10 @@
 from __future__ import division
 from sklearn.cluster import KMeans
 from numbers import Number
-import sys, codecs, numpy, json
+import sys, codecs, json
+import numpy as np
 
 def read_json_file(filename, object):
-   data = None
    with open(filename) as data_file:
       data = json.load(data_file, object_pairs_hook = object)
    return data
@@ -27,23 +27,39 @@ class autovivify_list(dict):
                 return -1 * x
         raise ValueError
 
-def build_word_vector_matrix(vector_file, n_words):
-    '''Iterate over the GloVe array read from sys.argv[1] and return its vectors and labels as arrays'''
-    numpy_arrays = []
-    labels_array = []
+def get_word_set(path):
+    temp = read_json_file(path+'title.json', list)
+    descs = read_json_file(path+'description.json', list)
+    short_descs = read_json_file(path+ 'short_description.json', list)
 
-    with codecs.open(vector_file, 'r') as f:
+    print(temp)
+    print(descs)
+    print(short_descs)
+
+    titles = []
+    for title in temp:
+        for word in title.split(' '):
+            titles.append(word)
+
+    return set(titles + descs + short_descs)
+
+def build(word_vector_file, word_set):
+    word_list = []
+    vector_list = []
+
+    with codecs.open(word_vector_file, 'r', 'utf-8') as f:
         for c, r in enumerate(f):
             sr = r.split()
             try:
-                labels_array.append(sr[0].encode("utf-8"))
-                numpy_arrays.append( numpy.array([float(i) for i in sr[1:]]) )
-            except:
-                pass
-            print c
-            if c == n_words: return numpy.array(numpy_arrays), labels_array
+                word = sr[0]
+                if word_set == None or word in word_set:
+                    word_list.append(word)
+                    vector = np.array([float(i) for i in sr[1:]])
+                    vector_list.append(vector)
+                    print(c)
+            except: pass
 
-    return numpy.array( numpy_arrays ), labels_array
+    return word_list, np.array(vector_list)
 
 def find_word_clusters(labels_array, cluster_labels):
     '''Read in the labels array and clusters label and return the set of words in each cluster'''
@@ -52,35 +68,34 @@ def find_word_clusters(labels_array, cluster_labels):
         cluster_to_words[ i ].append( labels_array[c] )
     return cluster_to_words
 
-# python 2
-# usage: python clustering.py glove_file n c
-# glove_file: pre-trained txt file
-# n: using first n words in glove_file
-# c: number of clusters
+def clustering(section, cluster_cnt = 20):
+    glove_file = "glove.6B.300d.txt"
 
-# output: cluster dictionary
+    words, vectors = build(glove_file, get_word_set('database/'+section+'/'))
+    kmeans_model = KMeans(init = 'k-means++', n_clusters = cluster_cnt, n_init = 10)
+    kmeans_model.fit(vectors)
 
-if __name__ == "__main__":
+    cluster_labels = kmeans_model.labels_
+    cluster_to_words = find_word_clusters(words, cluster_labels)
 
-    input_vector_file = sys.argv[1]
-    n_words           = int(sys.argv[2])
-    clusters_to_make  = int(sys.argv[3])
-    df, labels_array  = build_word_vector_matrix(input_vector_file, n_words)
-    kmeans_model      = KMeans(init='k-means++', n_clusters=clusters_to_make, n_init=10)
-    kmeans_model.fit(df)
-
-    cluster_labels    = kmeans_model.labels_
-    cluster_inertia   = kmeans_model.inertia_
-    cluster_to_words  = find_word_clusters(labels_array, cluster_labels)
+    with open('database/'+section+'/'+"clustered_file", "w") as f:
+        for c in cluster_to_words:
+            for word in cluster_to_words[c]:
+                f.write(word + '\t')
+            f.write('\n')
 
     cluster_dict = {}
 
+    cluster = 0
     for c in cluster_to_words:
-        cluster = 0
         for word in cluster_to_words[c]:
             cluster_dict.update({word : cluster})
         cluster += 1
 
-    with open("clustered_dictionary.json", "w") as f:
+    with open('database/'+section+'/'+"clustered_dictionary.json", "w") as f:
         json.dump(cluster_dict, f)
 
+
+# for test
+if __name__  == '__main__':
+    clustering(section = 'GAME_ARCADE', cluster_cnt = 25)

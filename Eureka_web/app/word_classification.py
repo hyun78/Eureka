@@ -113,13 +113,13 @@ def type_num_calculate(word_type_list, title_len):
 	type_num = '_'.join(list(map(str, word_type_list))) + '_'  + str(title_len)
 	
 	return type_num
-def save_type_statistics(file_dir,target,savename):
+def save_type_statistics(section):
 	#file_dir = database_crawling , target = 'arcade'
-	title_list = clear_parser(select_section('database/'+target,target),2,stereotype,stereotype_2)
+	title_list = clear_parser(select_section('database/'+section,section),2,stereotype,stereotype_2)
 	max_title_len = 10
 	#types = [[] for i in range(max_title_len)]
 	
-	cl_dict = read_cluster('clustered_dictionary_'+target+'.json')
+	cl_dict = read_cluster('database/'+section+'/clustered_dictionary.json')
 	bigdic = {}
 	for i in range(max_title_len):
 		bigdic[str(i)] = [[] for i in range(max_title_len)]
@@ -148,7 +148,7 @@ def save_type_statistics(file_dir,target,savename):
 	for j in range(max_title_len):
 		type_statistics.append([generate_type_statistics(bigdic[str(j)][i]) for i in range(max_title_len)])# if len(bigdic[str(j-i)][i])>0])
 		#type_statistics.append([generate_type_statistics(bigdic[str(j-i)][i]) for i in range(j+1) if len(bigdic[str(j-i)][i])>0])
-	with open(savename,'w') as f:
+	with open('database/'+section+'/type_statistics.json','w') as f:
 		json.dump(type_statistics,f)
 	return type_statistics
 
@@ -164,8 +164,8 @@ print(type_statistics[1])
 print(type_statistics[2])
 print(type_statistics[3])
 '''
-def read_cluster(filename):
-	with open(filename) as f:
+def read_cluster(filepath):
+	with open(filepath) as f:
 		t = json.load(f)
 	return t
 def classify_word_type2(w,dict_):
