@@ -37,9 +37,9 @@ def get_data(category,start,limit):
 	result = json.loads(data)
 
 	return result
-def data_savefile(filename,start,end):
+def data_savefile(filename,start,end,category):
 	limit = 100
-	category = 'GAME_ARCADE'
+	#category = 'GAME_ARCADE'
 	res = get_data(category,start,limit)
 	collection = []
 

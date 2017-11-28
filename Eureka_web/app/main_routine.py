@@ -1,6 +1,6 @@
 ##this is main routine file
-from wan import search_WAN
-from word_classification import *
+from .wan import search_WAN
+from .word_classification import *
 import numpy,random
 def setup_database():
 	file_dir,target = None ,None
@@ -117,14 +117,16 @@ def generate_type_with_words(type_no,type_word_dict):
 	res = ' '.join(res)
 	return res
 def generate_result(iter_num,type_word_dict,type_distribution):
-	res = []
+	res = {}
 	p_ = list(type_distribution.values())
 	lsts_ = list(type_distribution.keys())
 	type_distribution[lsts_[-1]] = type_distribution[lsts_[-1]]+ (1 - sum(p_))
 	p_ = list(type_distribution.values())
 	for i in range(iter_num):
 		randium_type = numpy.random.choice(lsts_, p=p_) 
-		res.append([generate_type_with_words(randium_type,type_word_dict),randium_type])
+		temp = [generate_type_with_words(randium_type,type_word_dict),randium_type]
+		res[temp[0]] = temp[1]
+
 	return res
 
 

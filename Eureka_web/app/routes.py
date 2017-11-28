@@ -2,7 +2,7 @@ from flask import Flask,render_template
 from flask import request as req
 import time
 
-from . import wan 
+from .main_routine import *
 
 
 #######################
@@ -21,29 +21,57 @@ def hello_world2(keywords):
     return "THIS IS RESULT"
 @app.route('/result')
 def test():
-	time.sleep(3)
-	input_data = req.args.get('keys')
-	print(input_data)
-	keywords_list = input_data.split(" ")
-	keywords_list = [x for x in keywords_list if not len(x)==0]
-	translated_list = []
-	for token in keywords_list:
-		translated_list +=wan.translate(token)
-	print("translated list",translated_list)
-	query_string = ' '.join(translated_list)
-	print("query string : ",query_string)
-	#using WAN search with query_string
-	#WAN_result = wan.search_WAN(query_string) 
-	
-	# translate result into korean words
-	
-	#make data tuple; (eng_word,korean_pronunciation,kor_word)
+	keyword_user = req.args.get('keys')
+	section = req.args.get('selected_section')
+	klst = keyword_user.split()
+	n = len(klst)
 
-	# combine
+	#genearte words set
+	associated_words_set = search_WAN(klst)
+	#associated_word_set[0] ~ associated_words_set[n-1] 
+	#associated_word_set[i]['text'] = klst[i]
+	#associated_word_set[i]['text'] = klst[i]'s associated words sorted by weight
+	k = 20
+	dict_ = read_cluster('clustered_dictionary.json')
+	word_dict = generate_word_dict(n,associated_words_set,k,dict_)
+	keyword_lst = []
 
-	# evaluating
+	for kw in klst:
+		temp = []
+		temp.append(kw)
+		temp.append(classify_word_type2(kw,dict_))
+		keyword_lst.append(temp)
 
-	# parsing data
+	#word dict = { keyword : [  [associated word1,type,pos]     ] }
+	#keyword dict = [ [keyword, type] ] 
 
-	#rendering 
-	return render_template('result_page.html')
+	#combine start
+	#type statistics [number of 고유명사] [ title length - number of 고유명사 ] 
+	num_pro = 0  #user input value
+	#     type_statistics[0][2]
+	# input : n keyword , and each k related word ; nk word
+	# output : O(nk*nk)
+	type_dict = {}
+	for aw in word_dict:
+		for te in word_dict[aw]:
+			type_dict[te[1]] = 0
+	avt = type_dict.keys() # 가능한 타입들 
+	cwn = []
+	for i in avt:
+		for j in avt:
+			cwn.append(str(i)+'_'+str(j)+'_2')
+		cwn.append(str(i)+'_1')
+	#cwn = ['1_3_2','2_4_2','1_1']
+	type_statistics= read_type_statistics('type_statistics.json')
+	type_distribution = generate_type_distribution(type_statistics,cwn)
+	# iter_num
+	iter_num = 100
+	type_word_dict = generate_type_word_dict(word_dict)
+	res = generate_result(iter_num,type_word_dict,type_distribution)
+	print(res)
+	print(section)
+	####
+	res_send = {}
+	res_send['names'] = res
+	res_send['section'] = section
+	return render_template('result_page.html',value=res_send)

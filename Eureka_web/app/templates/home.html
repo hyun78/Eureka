@@ -6,6 +6,13 @@
 	<h1> CS408 Eureka </h1>
 </div>
 <div style="text-align:center">
+	섹션을 선택해 주세요 
+	<select id="section" size="1" >
+		<option selected>==SECTION==</option>
+		<option value="GAME_ARCADE">APPLICATION ARCADE</option>
+		<option value="MUSIC_AND_AUDIO">APPLICATION MUSIC AND AUDIO</option>
+	</select>
+	<p>
 	키워드를 입력하세요(공백으로 구분):
 	<input type="text" id="keywords"> 	
 	<button id="serach_btn" onclick="do_analysis()"> 생성 </button>
@@ -24,6 +31,7 @@ function do_analysis(){
 	var keywords = document.getElementById("keywords").value;
 	alert(keywords);
 	var x = document.getElementById("loader");
+	var section = $('#section option:selected').val()
 	$('#result').hide();
 	$('#loader').show()
 	//x.style.display = 'block';
@@ -31,7 +39,7 @@ function do_analysis(){
 	$.ajax({
 		url: "/result",
 		type: "GET",
-		data: {keys:keywords},
+		data: {keys:keywords,selected_section:section},
 	    complete: function() {
 	    	$('#loader').hide();
     	},
@@ -43,7 +51,6 @@ function do_analysis(){
 			console.log(response);
 		}
 	});
-	
 }
 
 </script>

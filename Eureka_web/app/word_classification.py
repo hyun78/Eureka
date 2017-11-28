@@ -1,6 +1,6 @@
 import glove
 import numpy as np
-from title_clear_v2 import *
+from .title_clear_v2 import *
 import functools
 from nltk.stem import WordNetLemmatizer as lt
 CATEGORIES = [
