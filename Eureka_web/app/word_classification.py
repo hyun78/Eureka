@@ -115,11 +115,11 @@ def type_num_calculate(word_type_list, title_len):
 	return type_num
 def save_type_statistics(file_dir,target,savename):
 	#file_dir = database_crawling , target = 'arcade'
-	title_list = clear_parser(select_section('database_crawling','arcade'),2,stereotype,stereotype_2)
+	title_list = clear_parser(select_section('database/'+target,target),2,stereotype,stereotype_2)
 	max_title_len = 10
 	#types = [[] for i in range(max_title_len)]
 	
-	cl_dict = read_cluster('clustered_dictionary.json')
+	cl_dict = read_cluster('clustered_dictionary_'+target+'.json')
 	bigdic = {}
 	for i in range(max_title_len):
 		bigdic[str(i)] = [[] for i in range(max_title_len)]
