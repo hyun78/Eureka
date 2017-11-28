@@ -53,7 +53,7 @@ def main():
 	#cwn = ['1_3_2','2_4_2','1_1']
 	type_statistics= read_type_statistics('type_statistics.json')
 
-	type_distribution = generate_type_distribution(num_pro,type_statistics,cwn)
+	type_distribution = generate_type_distribution(type_statistics,cwn)
 	# iter_num
 	iter_num = 100
 	
@@ -80,11 +80,12 @@ def generate_word_dict(n,associated_words_set,k,dict_):
 	return word_dict
 
 
-def generate_type_distribution(num_pro,type_statistics,cwn):
+def generate_type_distribution(type_statistics,cwn):
 	type_distribution = {}
 	total = 0
 	
 	for type_number in cwn:
+		num_pro = type_number.split('_').count('-1')
 		len_ = int(type_number[-1])
 		try:
 			type_distribution[type_number]= type_statistics[num_pro][len_][type_number][0]
