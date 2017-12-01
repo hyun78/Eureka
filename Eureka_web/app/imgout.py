@@ -10,18 +10,21 @@ from numpy import array
 
 def make_wan_img(section,type_list):
 	nArray = make_img_arr(section)
-
+	nArray2 = np.zeros(nArray.shape)
 	for i in range(len(nArray)):
 		for j in range(len(nArray)):
-			if ('_'.join([i,j,2]) in type_list):
-				nArray[i][j] = 0
-
+			for tnum in type_list:
+				lst = tnum.split('_')
+				if len(lst)==3 and  (int(lst[0])==i and int(lst[1])==j):
+					nArray2[i][j] = nArray[i][j]
+					# print(lst,i,j,len(nArray),nArray)
+	print(type_list)
 	colorscheme = 'Reds'
 	fig = plt.figure()
 	fig.suptitle(section)
 	plt.xlabel('X-Axis')
 	plt.ylabel('Y-Axis')
-	plt.imshow(nArray, cmap=colorscheme)
+	plt.imshow(nArray2, cmap=colorscheme)
 	plt.colorbar()
 	plt.show()
 	plt.savefig('templates/'+colorscheme+section+'_WANcencored.png')
