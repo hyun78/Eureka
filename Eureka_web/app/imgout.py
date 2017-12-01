@@ -9,9 +9,27 @@ import random
 from numpy import array
 
 def make_wan_img(section,type_list):
+	nArray = make_img_arr(section)
+
+	for i in range(len(nArray)):
+		for j in range(len(nArray)):
+			if ('_'.join([i,j,2]) in type_list):
+				nArray[i][j] = 0
+
+	colorscheme = 'Reds'
+	fig = plt.figure()
+	fig.suptitle(section)
+	plt.xlabel('X-Axis')
+	plt.ylabel('Y-Axis')
+	plt.imshow(nArray, cmap=colorscheme)
+	plt.colorbar()
+	plt.show()
+	plt.savefig('templates/'+colorscheme+section+'_WANcencored.png')
+	plt.close()
+
 	return
 
-def make_img(section):
+def make_img_arr(section):
 	with open('database/'+section+'/type_statistics.json') as f:
 		q = json.load(f,object_pairs_hook=OrderedDict)
 
@@ -33,6 +51,11 @@ def make_img(section):
 		res[tmp1[0]][tmp1[1]] +=int(t3[k3][0])
 
 	nArray = array(res)
+
+	return nArray
+
+def make_img(section):
+	nArray = make_img_arr(section)
 	#a11=nArray.reshape(50,100)
 	print(nArray)
 	colors = ['brg','viridis','plasma','inferno','magma','Greys','Purples','Blues','Greens','Oranges','Reds','YlOrBr','YlOrRd','OrRd','PuRd','RdPu','BuPu','GnBu','PuBu','YlGnBu',
