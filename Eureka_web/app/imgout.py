@@ -3,6 +3,7 @@ from collections import OrderedDict
 import json
 import numpy as np
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import random
 from numpy import array
@@ -52,7 +53,7 @@ def make_img(section):
 	plt.imshow(nArray, cmap=colorscheme)
 	plt.colorbar()
 	plt.show()
-	plt.savefig('/templates/'colorscheme+section+'.png')
+	plt.savefig('templates/'+colorscheme+section+'.png')
 	plt.close()
 	return
 
