@@ -1,7 +1,13 @@
 ##this is main routine file
-from .wan import search_WAN
-from .word_classification import *
-from .clustering import *
+
+try:
+	from .wan import search_WAN
+	from .word_classification import *
+	from .clustering import *
+except:
+	from wan import search_WAN
+	from word_classification import *
+	from clustering import *
 import numpy,random
 def setup_database(section,number_of_clusters=30):
 	file_dir,target = "database" ,section
@@ -90,6 +96,8 @@ def generate_type_distribution(type_statistics,cwn):
 	
 	for type_number in cwn:
 		num_pro = type_number.split('_').count('-1')
+		if num_pro:
+			continue
 		len_ = int(type_number[-1])
 		try:
 			type_distribution[type_number]= type_statistics[num_pro][len_][type_number][0]
