@@ -26,7 +26,14 @@
      font-family: Arial, sans-serif;
      -webkit-padding-start: 0px;
    }
-
+   .flex1 {
+  -webkit-flex: 1;
+          flex: 1;
+	}
+	.flex2 {
+	  -webkit-flex: 2;
+	          flex: 2;
+	}
   </style>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -37,7 +44,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/"><img class="logo" src="/static/imgs/logo.png" /><img class="logo-text" src="/static/imgs/chedu.png" /></a>
+          
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -48,22 +55,22 @@
     </nav>
     <div class="container">
       <h3>  Results</b></h3>
-      <h3>  Results</b></h3>
+      
 
     </div>
-    <div class="container">
-      <div class="col-sm-4">
-        <img src={{img_name1}}></img>
+    <div class="container" style="width: 640px; margin:0px auto 0;">
+      <div class="flex1" >
+        <img src={{img_name1}} ></img>
+        <!-- <img id="originalimg" src={{img_name2}} style="position: absolute; " ></img> -->
       </div><!-- /.col-sm-4 -->
-
-      <div class="col-sm-8">
-
-        <div class="others">
+    </div>
+    <div class="flex2" >
+      	<div class="others">
 
           <h4>Top 5 results</b></h4>
 
           <ul class="top5_list">
-            {% for name in value['top5'].keys() %}
+            {% for name in value['top5'] %}
             	<li class="list-group-item"> {{name}} </li>
             {% endfor %}
           </ul>
@@ -75,11 +82,59 @@
           </ul>
 
       </div><!-- /.col-sm-4 -->
-
-    </div>
+    <script type="text/javascript">
+ 
+		function fadeIn(id)
+		{
+			var level = 0;
+			var inTimer = null;
+			inTimer = setInterval( function(){ level = fadeInAction(id, level, inTimer); }, 50 );
+		}
+ 
+		function fadeInAction(id, level, inTimer)
+		{
+			level = level + 0.01;
+			changeOpacity(id, level);
+			if(level > 1) 
+			{
+				clearInterval(inTimer);
+			}
+			return level;
+		}
+ 
+		function fadeOut(id)
+		{
+			var level = 1;
+			var outTimer = null;
+			outTimer = setInterval( function(){ level = fadeOutAction(id, level, outTimer); }, 50 );
+		}
+ 
+		function fadeOutAction(id, level, outTimer)
+		{
+			level = level - 0.03;
+			changeOpacity(id, level);
+			if(level < 0) 
+			{
+				clearInterval(outTimer);
+			}
+			return level;
+		}
+ 
+		function changeOpacity(id,level) 
+		{
+			var obj = document.getElementById(id);
+			obj.style.opacity = level; 
+			obj.style.MozOpacity = level; 
+			obj.style.KhtmlOpacity = level;
+			obj.style.MsFilter = "'progid:DXImageTransform.Microsoft.Alpha(Opacity=" + (level * 100) + ")'";
+			obj.style.filter = "alpha(opacity=" + (level * 100) + ");"; 
+		}
+ 	
+ 	fadeOut('originalimg')
+ 	
+	</script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="/static/chat.js"></script>
-  </body>
+   </body>
 </html>

@@ -176,4 +176,3 @@ def generate_result(iter_num,type_word_dict,type_distribution):
 
 
 
-

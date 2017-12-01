@@ -85,11 +85,14 @@ def test():
 	print(section)
 	####
 	res_send = {}
-	res_send['names'] = res
+	res_send['top5'] =  generate_top_5(section,klst,stereotype)
+	print(res_send['top5'])
+	res_send['others'] = res
 	res_send['section'] = section
 	make_img(section)
 	make_wan_img(section,cwn)
-	return render_template('result_page.html',value=res_send,img_name1=('templates/'+colorscheme+section+'_WANcencored.png'),img_name2=('templates/'+colorscheme+section+'.png'))
+	colorscheme = 'Reds'
+	return render_template('result_page.html',value=res_send,img_name1=('static/'+colorscheme+section+'_WANcencored.png'),img_name2=('static/'+colorscheme+section+'.png'))
 
 @app.route('/admin_page')
 def admin_page_view():

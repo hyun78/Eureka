@@ -22,12 +22,12 @@ def make_wan_img(section,type_list):
 	colorscheme = 'Reds'
 	fig = plt.figure()
 	fig.suptitle(section)
-	plt.xlabel('X-Axis')
-	plt.ylabel('Y-Axis')
+	plt.xlabel("first word's cluster")
+	plt.ylabel("second word's cluster")
 	plt.imshow(nArray2, cmap=colorscheme)
 	plt.colorbar()
 	plt.show()
-	plt.savefig('templates/'+colorscheme+section+'_WANcencored.png')
+	plt.savefig('static/'+colorscheme+section+'_WANcencored.png')
 	plt.close()
 
 	return
@@ -74,12 +74,12 @@ def make_img(section):
 	colorscheme = 'Reds'
 	fig = plt.figure()
 	fig.suptitle(section)
-	plt.xlabel('X-Axis')
-	plt.ylabel('Y-Axis')
+	plt.xlabel("first word's cluster")
+	plt.ylabel("second word's cluster")
 	plt.imshow(nArray, cmap=colorscheme)
 	plt.colorbar()
 	plt.show()
-	plt.savefig('templates/'+colorscheme+section+'.png')
+	plt.savefig('static/'+colorscheme+section+'.png')
 	plt.close()
 	return
 
