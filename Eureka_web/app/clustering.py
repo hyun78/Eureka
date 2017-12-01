@@ -32,14 +32,14 @@ def get_word_set(path):
     descs = read_json_file(path+'description.json', list)
     short_descs = read_json_file(path+ 'short_description.json', list)
 
-    print(temp)
-    print(descs)
-    print(short_descs)
-
     titles = []
     for title in temp:
         for word in title.split(' '):
             titles.append(word)
+
+    titles = list(map(lambda x: x.lower(), titles))
+    descs = list(map(lambda x: x.lower(), descs))
+    short_descs = list(map(lambda x: x.lower(), short_descs))
 
     return set(titles + descs + short_descs)
 
