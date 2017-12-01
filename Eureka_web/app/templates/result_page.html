@@ -1,8 +1,85 @@
-<h1>THIS IS TEST RESULT PAGE </h1>
+<html>
+  <head>
+    <meta id="data" data-passcode="{{passcode}}" data-uname="{{uname}}"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/static/main.css">
+    <link rel="stylesheet" href="/static/chat.css">
+    <title>Eureka result</title>
+  </head>
+  <style>
+   ul {
+     font-size: 16px;
+   }
+   .top5_list{
+     padding-left: :0
+     height:220px;
+     border: 2px solid #ccc;
+     font-family: Arial, sans-serif;
+     -webkit-padding-start: 0px;
+   }
+   .list-others
+   {
+     overflow-y: scroll;
+     height:220px;
+     border: 2px solid #ccc;
+     font-family: Arial, sans-serif;
+     -webkit-padding-start: 0px;
+   }
 
-<h3>selected section: {{ value['section'] }}<h3>
+  </style>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/"><img class="logo" src="/static/imgs/logo.png" /><img class="logo-text" src="/static/imgs/chedu.png" /></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a>Project Eureka</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <div class="container">
+      <h3>  Results</b></h3>
+      <h3>  Results</b></h3>
 
-{% for name in value['names'].keys() %}
-	<li> {{name}} {{value['names'][name]}}</li>
-{% endfor %}
-<h3>
+    </div>
+    <div class="container">
+      <div class="col-sm-4">
+        <img src={{img_name1}}></img>
+      </div><!-- /.col-sm-4 -->
+
+      <div class="col-sm-8">
+
+        <div class="others">
+
+          <h4>Top 5 results</b></h4>
+
+          <ul class="top5_list">
+            {% for name in value['top5'].keys() %}
+            	<li class="list-group-item"> {{name}} </li>
+            {% endfor %}
+          </ul>
+
+          <ul class="list-others">
+            {% for name in value['others'].keys() %}
+            	<li class="list-group-item"> {{name}} </li>
+            {% endfor %}
+          </ul>
+
+      </div><!-- /.col-sm-4 -->
+
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="/static/chat.js"></script>
+  </body>
+</html>
