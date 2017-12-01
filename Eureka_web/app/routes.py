@@ -4,7 +4,7 @@ from flask import request as req
 import time
 import os
 from .main_routine import *
-
+from .imgout import *
 
 #######################
 #   FLASK APP ROUTE   #
@@ -61,12 +61,16 @@ def test():
 	for aw in word_dict:
 		for te in word_dict[aw]:
 			type_dict[te[1]] = 0
+
+
 	avt = type_dict.keys() # 가능한 타입들 
 	cwn = []
 	for i in avt:
 		for j in avt:
 			cwn.append(str(i)+'_'+str(j)+'_2')
 		cwn.append(str(i)+'_1')
+
+
 	#cwn = ['1_3_2','2_4_2','1_1']
 	type_statistics= read_type_statistics('database/'+section+'/type_statistics.json')
 	# list of dictionary; type_statistics[i][j] : 고유어가 i개 들어간 j길이의 제목들의 통계 
@@ -83,7 +87,9 @@ def test():
 	res_send = {}
 	res_send['names'] = res
 	res_send['section'] = section
-	return render_template('result_page.html',value=res_send)
+	make_img(section)
+	make_wan_img(section,cwn)
+	return render_template('result_page.html',value=res_send,img_name1=('templates/'+colorscheme+section+'_WANcencored.png'),img_name2=('templates/'+colorscheme+section+'.png'))
 
 @app.route('/admin_page')
 def admin_page_view():
