@@ -69,9 +69,12 @@ def test():
 		cwn.append(str(i)+'_1')
 	#cwn = ['1_3_2','2_4_2','1_1']
 	type_statistics= read_type_statistics('database/'+section+'/type_statistics.json')
+	# list of dictionary; type_statistics[i][j] : 고유어가 i개 들어간 j길이의 제목들의 통계 
+	# type_statistics[i][j][typenum][0] : typenum으로 분류되는 제목들의 숫자
 	type_distribution = generate_type_distribution(type_statistics,cwn)
-	# iter_num
+	# iter_num : 몇개의 단어를 뽑을 것인가?
 	iter_num = 100
+	#word dict이 keyword : [word,typenumber,pos] 였다면 이건 typenum:[word1, word2, ...]인 dictonary
 	type_word_dict = generate_type_word_dict(word_dict)
 	res = generate_result(iter_num,type_word_dict,type_distribution)
 	print(res)
